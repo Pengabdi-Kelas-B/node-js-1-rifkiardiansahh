@@ -34,19 +34,33 @@ app.makeFile = () => {
 // script sort file
 app.extSorter = () => {
   const sourceDir = path.join(__dirname, "unorganize_folder");
+  const imageDir = path.join(__dirname, "image");
+  const textDir = path.join(__dirname, "text");
+
+  if (!fs.existsSync(imageDir)) fs.mkdirSync(imageDir);
+  if (!fs.existsSync(textDir)) fs.mkdirSync(textDir);
+
   fs.readdir(sourceDir, (err, files) => {
     if (err) return console.error("Failed Read Folder", err);
 
     files.forEach((file) => {
-      const ext = path.extname(file).substring(1); // get file extention
-      const destDir = path.join(__dirname, ext);
+      const ext = path.extname(file).substring(1).toLowerCase(); // Mendapatkan ekstensi file dalam huruf kecil
+      const srcPath = path.join(sourceDir, file);
 
-      if (!fs.existsSync(destDir)) fs.mkdirSync(destDir);
-
-      fs.rename(path.join(sourceDir, file), path.join(destDir, file), (err) => {
-        if (err) console.error("Failed move file:", err);
-        else console.log(`File ${file} success move to folder ${ext} `);
-      });
+      // Move file to folder
+      if (["jpg", "png"].includes(ext)) {
+        fs.rename(srcPath, path.join(imageDir, file), (err) => {
+          if (err) console.error("Failed move File Image:", err);
+          else console.log(`File ${file} success moved to folder image`);
+        });
+      } else if (["txt", "md"].includes(ext)) {
+        fs.rename(srcPath, path.join(textDir, file), (err) => {
+          if (err) console.error("Failed move File teks:", err);
+          else console.log(`File ${file} success moved to folder text`);
+        });
+      } else {
+        console.log(`File ${file} failed to moved.`);
+      }
     });
   });
 };
